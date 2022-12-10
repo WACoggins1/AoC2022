@@ -1,0 +1,47 @@
+
+#movement tuple
+with open("day9.txt", "r") as f:
+    direction = {
+        'R': (1,0),
+        'L': (-1,0),
+        'U': (0,1),
+        'D': (0,-1)
+    }
+
+    moves = []
+
+    for line in f:
+        d, p = line.rstrip().split()
+        moves.append((d,int(p))) #movement set of instructions from input.
+
+
+    def follow(head,tail): #movement of head and tail
+        x,y = head[0] - tail[0], head[1] - tail[1]
+
+        if abs(x) > 1 or abs(y) > 1:
+            #move at most one unit in any direction
+            return (
+                tail[0] + (0 if x ==0 else x // abs(x)),
+                tail[1] + (0 if y ==0 else y // abs(y))
+            )
+        return tail
+
+
+    def solve(knots):
+        rope = [(0,0) for _ in range(knots)] #we have visited the starting node
+        tailVisited = {rope[-1]}
+
+        for move in moves:
+            vector = direction[move[0]]
+
+            for _ in range(move[1]): #iterate in direction
+                H = rope[0] #head
+                rope[0] = H[0] + vector[0], H[1] + vector[1] #update head position
+
+                for x in range(1,knots): #update tail position
+                    rope[x] = follow(rope[x-1], rope[x])
+                tailVisited.add(rope[-1])
+        return len(tailVisited)
+
+    print("Part 1:", solve(knots=2))
+    print("Part 2:", solve(knots = 10))
